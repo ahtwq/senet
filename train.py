@@ -8,6 +8,7 @@ from torchvision import transforms
 import torch.optim.lr_scheduler as lr_scheduler
 import utils
 import models
+import dataLoader
 import tabulate
 from PIL import Image, ImageFile
 import numpy as np
@@ -45,7 +46,7 @@ with open(os.path.join(args.dir, 'command.sh'), 'w') as f:
 
 ## dataset
 print('Loading dataset')
-loaders = utils.load_cifar10(args.train_batchSize, args.test_batchSize)
+loaders = dataLoader.load_cifar10(args.train_batchSize, args.test_batchSize)
        
 ## model
 print('Building model')
