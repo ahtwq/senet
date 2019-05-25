@@ -16,6 +16,7 @@ import random
 ## args
 parser = argparse.ArgumentParser(description='clarity training')
 parser.add_argument('--dir', type=str, default=None, required=True, help='training directory (default: None)')
+parser.add_argument('--se', type=bool, help='whether use se_net(default: No)')
 parser.add_argument('--train_batchSize', type=int, default=32, metavar='N', help='input batch size (default: 32)')
 parser.add_argument('--test_batchSize', type=int, default=10, metavar='N', help='input batch size (default: 10)')
 parser.add_argument('--num_workers', type=int, default=4, metavar='N', help='number of workers (default: 4)')
@@ -49,9 +50,10 @@ loaders = utils.load_cifar10(args.train_batchSize, args.test_batchSize)
 ## model
 print('Building model')
 num_classes = 6
-model_pretrained = torchvision.models.resnet34(pretrained=True)
-model = models.MultiScale_resnet34(model_pretrained, num_classes)
-
+model = models.resnet20(num_classes)
+if args.se:
+    model = models.se_resnet20(num_classes)
+    
 use_gpu = torch.cuda.is_available()
 if use_gpu:
     print('Let us use {} GPUs'.format(torch.cuda.device_count()))
@@ -65,7 +67,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=args.lr_init, momentum=args.m
 ## lr schedule
 scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
-# cosine learning rate delay
+## cosine learning rate delay
 def adjust_lr(optimizer, epoch, epochs, M=1, alpha_zero=0.001):
     cos_inner = np.pi * (epoch % (epochs // M))
     cos_inner /= epochs // M
@@ -87,7 +89,8 @@ for epoch in range(0, args.epochs):
     
     train_res = utils.train_epoch(loaders['train'], model, criterion, optimizer, num_classes)
     test_res = utils.eval(loaders['test'], model, criterion, num_classes)
-
+    
+    ## save model
     if test_res['accuracy'] >= best_acc_on_dev:
         # best_acc_on_dev = test_res['accuracy']
         utils.save_checkpoint(
@@ -96,7 +99,7 @@ for epoch in range(0, args.epochs):
             state_dict=model.state_dict(),
             optimizer=optimizer.state_dict()
         )
-        
+    ## write info.
     txt = open(os.path.join(args.dir, 'conf_matrix.txt'), 'a+')
     txt.write('epoch' + str(epoch) + '\n')
     txt.write('-'*20 + '\n')
