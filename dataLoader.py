@@ -70,7 +70,7 @@ def loader(img_root, train_txt, test_txt, Train_batchSize, Test_batchSize):
     }
     return loaders
 
-def load_cifar10(Train_batchSize, Test_batchSize):
+def load_cifar10(Train_batchSize=32, Test_batchSize=16):
     train_transform = transforms.Compose([transforms.RandomHorizontalFlip(), transforms.ToTensor()])
     test_transform = transforms.Compose([transforms.ToTensor()])
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
@@ -81,13 +81,13 @@ def load_cifar10(Train_batchSize, Test_batchSize):
             train_set,
             batch_size=Train_batchSize,
             shuffle=True,
-            num_workers=args.num_workers,
+            num_workers=4,
         ),
         'test': DataLoader(
             test_set,
             batch_size=Test_batchSize,
             shuffle=False,
-            num_workers=args.num_workers,
+            num_workers=4,
         )
     }
     return loaders
