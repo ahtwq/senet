@@ -1,6 +1,7 @@
 import os
 import torch
 from torch import nn
+import torchvision
 from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
