@@ -58,13 +58,13 @@ def loader(img_root, train_txt, test_txt, Train_batchSize, Test_batchSize):
             train_set,
             batch_size=Train_batchSize,
             shuffle=True,
-            num_workers=args.num_workers,
+            num_workers=4,
         ),
         'test': DataLoader(
             test_set,
             batch_size=Test_batchSize,
             shuffle=False,
-            num_workers=args.num_workers,
+            num_workers=4,
         )
     }
     return loaders
