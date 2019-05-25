@@ -66,7 +66,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=args.lr_init, momentum=args.momentum, weight_decay=args.wd)
 
 ## lr schedule
-scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
 
 ## cosine learning rate delay
 def adjust_lr(optimizer, epoch, epochs, M=1, alpha_zero=0.001):
