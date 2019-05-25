@@ -93,7 +93,7 @@ for epoch in range(0, args.epochs):
     
     ## save model
     if test_res['accuracy'] >= best_acc_on_dev:
-        # best_acc_on_dev = test_res['accuracy']
+        best_acc_on_dev = test_res['accuracy']
         utils.save_checkpoint(
             args.dir,
             epoch,
