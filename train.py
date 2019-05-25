@@ -4,23 +4,20 @@ import sys
 import time
 import torch
 from torch import nn
-from torchvision import models, transforms
+from torchvision import transforms
 import torch.optim.lr_scheduler as lr_scheduler
 import utils
 import models
 import tabulate
-from torch.utils.data import Dataset, DataLoader
 from PIL import Image, ImageFile
 import numpy as np
 import random
-np.set_printoptions(suppress=True)
-ImageFile.LOAD_TRUNCATED_IMAGES = True
-
 
 ## args
 parser = argparse.ArgumentParser(description='clarity training')
 parser.add_argument('--dir', type=str, default=None, required=True, help='training directory (default: None)')
-parser.add_argument('--batch_size', type=int, default=20, metavar='N', help='input batch size (default: 32)')
+parser.add_argument('--train_batchSize', type=int, default=32, metavar='N', help='input batch size (default: 32)')
+parser.add_argument('--test_batchSize', type=int, default=10, metavar='N', help='input batch size (default: 10)')
 parser.add_argument('--num_workers', type=int, default=4, metavar='N', help='number of workers (default: 4)')
 parser.add_argument('--epochs', type=int, default=200, metavar='N', help='number of epochs to train (default: 200)')
 parser.add_argument('--lr_init', type=float, default=0.01, metavar='LR', help='initial learning rate (default: 0.01)')
@@ -47,12 +44,8 @@ with open(os.path.join(args.dir, 'command.sh'), 'w') as f:
 
 ## dataset
 print('Loading dataset')
-train_transform = transforms.Compose([transforms.RandomHorizontalFlip(), transforms.ToTensor()])
-test_transform = transforms.Compose([transforms.ToTensor()])
-train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
-test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=test_transform)
+loaders = utils.load_cifar10(args.train_batchSize, args.test_batchSize)
        
-        
 ## model
 print('Building model')
 num_classes = 6
@@ -63,7 +56,7 @@ use_gpu = torch.cuda.is_available()
 if use_gpu:
     print('Let us use {} GPUs'.format(torch.cuda.device_count()))
     model = nn.DataParallel(model)
-    model = model.cuda()
+    model.cuda()
 
 ## loss func
 criterion = nn.CrossEntropyLoss()
@@ -71,6 +64,8 @@ optimizer = torch.optim.SGD(model.parameters(), lr=args.lr_init, momentum=args.m
 
 ## lr schedule
 scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
+# cosine learning rate delay
 def adjust_lr(optimizer, epoch, epochs, M=1, alpha_zero=0.001):
     cos_inner = np.pi * (epoch % (epochs // M))
     cos_inner /= epochs // M
