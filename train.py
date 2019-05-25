@@ -79,7 +79,7 @@ def adjust_lr(optimizer, epoch, epochs, M=1, alpha_zero=0.001):
     
 ## train model
 print('Starting train model')
-columns = ['ep', 'lr', 'tr_loss', 'tr_acc', 'te_loss', 'te_acc', 'time']
+columns = ['ep', 'lr', 'tr_loss', 'tr_acc', 'te_loss', 'te_acc', 'time[h]']
 best_acc_on_dev = 0.0 
 for epoch in range(0, args.epochs):
     time_ep = time.time()
