@@ -18,8 +18,7 @@ import random
 parser = argparse.ArgumentParser(description='clarity training')
 parser.add_argument('--dir', type=str, default=None, required=True, help='training directory (default: None)')
 parser.add_argument('--se', type=bool, help='whether use se_net(default: No)')
-parser.add_argument('--train_batchSize', type=int, default=32, metavar='N', help='input batch size (default: 32)')
-parser.add_argument('--test_batchSize', type=int, default=10, metavar='N', help='input batch size (default: 10)')
+parser.add_argument('--batch_size', type=int, default=32, metavar='N', help='input batch size (default: 32)')
 parser.add_argument('--num_workers', type=int, default=4, metavar='N', help='number of workers (default: 4)')
 parser.add_argument('--epochs', type=int, default=200, metavar='N', help='number of epochs to train (default: 200)')
 parser.add_argument('--lr_init', type=float, default=0.01, metavar='LR', help='initial learning rate (default: 0.01)')
@@ -66,16 +65,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=args.lr_init, momentum=args.momentum, weight_decay=args.wd)
 
 ## lr schedule
-scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
-
-## cosine learning rate delay
-def adjust_lr(optimizer, epoch, epochs, M=1, alpha_zero=0.001):
-    cos_inner = np.pi * (epoch % (epochs // M))
-    cos_inner /= epochs // M
-    cos_out = np.cos(cos_inner) + 1
-    cur_lr =  float(alpha_zero / 2 * cos_out)
-    return cur_lr
-
+scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[40, 70], gamma=0.1)
     
 ## train model
 print('Starting train model')
@@ -85,9 +75,7 @@ for epoch in range(0, args.epochs):
     time_ep = time.time()
     scheduler.step()
     lr = optimizer.param_groups[0]['lr']
-    #lr = adjust_lr(optimizer, epoch, args.epochs, M=1, alpha_zero=args.lr_init)
-    #utils.adjust_learning_rate(optimizer, lr)
-    
+
     train_res = utils.train_epoch(loaders['train'], model, criterion, optimizer, num_classes)
     test_res = utils.eval(loaders['test'], model, criterion, num_classes)
     
@@ -112,7 +100,7 @@ for epoch in range(0, args.epochs):
     time_ep = (time.time() - time_ep) / 60
     values = [epoch, lr, train_res['loss'], train_res['accuracy'], test_res['loss'], test_res['accuracy'], time_ep]
     table = tabulate.tabulate([values], columns, tablefmt='simple', floatfmt='10.6f')
-    if epoch % 10 == 0:
+    if epoch % 20 == 0:
         table = table.split('\n')
         table = '\n'.join([table[1]] + table)
     else:
