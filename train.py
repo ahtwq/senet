@@ -50,9 +50,9 @@ loaders = dataLoader.load_cifar10(args.train_batchSize, args.test_batchSize)
 ## model
 print('Building model')
 num_classes = 6
-model = models.resnet20()
+model = models.resnet34()
 if args.se:
-    model = models.se_resnet20()
+    model = models.se_resnet34()
     
 use_gpu = torch.cuda.is_available()
 if use_gpu:
