@@ -5,7 +5,7 @@
 
 ## Run
 运行 resnet
-> python train.py --dir=weight --epochs=100 --train_batchSize=30 --test_batchSize=10 --lr_init=0.001 
+> python train.py --dir=weight --epochs=100 --batch_size=32 --lr_init=0.001 
 
 运行 se_resnet
-> python train.py --dir=weight --epochs=100 --train_batchSize=30 --test_batchSize=10 --lr_init=0.001 --se
+> python train.py --dir=weight --epochs=100 --batch_size=32 --lr_init=0.001 --se
