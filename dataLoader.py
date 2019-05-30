@@ -33,7 +33,7 @@ class Mydataset(Dataset):
         return len(self.label_list)
 
                      
-def loader(img_root, train_txt, test_txt, Train_batchSize, Test_batchSize):
+def loader(img_root, train_txt, test_txt, batch_size):
 
     train_transform = transforms.Compose([
                             transforms.Resize(512*2),
@@ -57,20 +57,20 @@ def loader(img_root, train_txt, test_txt, Train_batchSize, Test_batchSize):
     loaders = {
         'train': DataLoader(
             train_set,
-            batch_size=Train_batchSize,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
         ),
         'test': DataLoader(
             test_set,
-            batch_size=Test_batchSize,
+            batch_size=batch_size,
             shuffle=False,
             num_workers=4,
         )
     }
     return loaders
 
-def load_cifar10(Train_batchSize=32, Test_batchSize=16):
+def load_cifar10(batch_size=16):
     train_transform = transforms.Compose([transforms.RandomHorizontalFlip(), transforms.ToTensor()])
     test_transform = transforms.Compose([transforms.ToTensor()])
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
@@ -79,13 +79,13 @@ def load_cifar10(Train_batchSize=32, Test_batchSize=16):
     loaders = {
         'train': DataLoader(
             train_set,
-            batch_size=Train_batchSize,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
         ),
         'test': DataLoader(
             test_set,
-            batch_size=Test_batchSize,
+            batch_size=batch_size,
             shuffle=False,
             num_workers=4,
         )
