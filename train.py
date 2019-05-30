@@ -45,7 +45,7 @@ with open(os.path.join(args.dir, 'command.sh'), 'w') as f:
 
 ## dataset
 print('Loading dataset')
-loaders = dataLoader.load_cifar10(args.train_batchSize, args.test_batchSize)
+loaders = dataLoader.load_cifar10(args.batch_size)
        
 ## model
 print('Building model')
